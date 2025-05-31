@@ -15,10 +15,10 @@ const InsightsCard = ({ sentimentData, featureData }) => {
       : 'positive';
   
     return (
-      <div className="insights-card">
-        <h3>Key Insights</h3>
+      <div className="bg-white rounded shadow p-6 space-y-4">
+        <h3 className="text-xl font-semibold">Key Insights</h3>
         
-        <div className={`sentiment-banner ${overallSentiment}`}>
+        <div className={`p-3 rounded ${overallSentiment === 'negative' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
           {overallSentiment === 'negative' ? (
             <p>⚠️ Customers are generally dissatisfied ({Math.round(sentimentData.Negative * 100)}% negative sentiment)</p>
           ) : (

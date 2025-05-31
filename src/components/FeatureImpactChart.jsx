@@ -1,13 +1,12 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const FeatureImpactChart = ({ data }) => {
-  // Sort by absolute coefficient value for better visualization
   const sortedData = [...data].sort((a, b) => Math.abs(b.Coefficient) - Math.abs(a.Coefficient));
 
   return (
-    <div className="feature-chart">
-      <h3>Feature Impact on Sentiment</h3>
-      <p className="subtitle">Positive values improve sentiment, negative values hurt sentiment</p>
+    <div className="bg-white rounded shadow p-6">
+      <h3  className="text-xl font-semibold mb-2" >Feature Impact on Sentiment</h3>
+      <p className="text-sm text-gray-500 mb-4">Positive values improve sentiment, negative values hurt sentiment</p>
       
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={400}>

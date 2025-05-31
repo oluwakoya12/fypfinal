@@ -13,8 +13,8 @@ const SentimentPieChart = ({ data }) => {
   ).toFixed(1);
 
   return (
-    <div className="sentiment-chart">
-      <h3>Sentiment Distribution</h3>
+    <div className="bg-white rounded shadow p-6">
+      <h3 className='font-semibold text-xl'>Sentiment Distribution</h3>
       <div className="sentiment-summary">
         <h2 
           className={dominantSentiment === 'Negative' ? 'negative' : 'positive'}

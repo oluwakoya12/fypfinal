@@ -13,7 +13,7 @@ const ReviewsTable = ({ data }) => {
   });
 
   return (
-    <div className="reviews-table">
+    <div className="bg-white rounded shadow p-6">
       <div className="table-controls">
         <input
           type="text"
