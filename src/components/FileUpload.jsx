@@ -1,19 +1,22 @@
+import { useState } from 'react';
 import { FaUpload, FaCheckCircle } from 'react-icons/fa';
 
 const FileUpload = ({ setAnalysisData, setIsLoading }) => {
+  const [responseData, setResponseData] = useState(null);
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setIsLoading(true);
+
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const response = await fetch('https://fyp-3jps.onrender.com/api/v1/analyze', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/analyze', {
         method: 'POST',
         body: formData,
-        mode: 'cors',
         headers: {
           Accept: 'application/json',
         },
@@ -24,18 +27,30 @@ const FileUpload = ({ setAnalysisData, setIsLoading }) => {
       }
 
       const data = await response.json();
-      setAnalysisData(data);
       console.log(data)
+
+      if (
+        data.sentiment_distribution &&
+        data.feature_impacts &&
+        data.sample_predictions &&
+        data.raw_data
+      ) {
+        setAnalysisData(data);
+        setResponseData(data); // for optional display
+      } else {
+        alert('Unexpected response format. Check console.');
+        console.error('Unexpected response:', data);
+      }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error analyzing file. Please check the console for details.');
+      alert('Error analyzing file. Please ensure the CSV is formatted correctly and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-purple-700">Review Sentiment Analyzer</h2>
         <p className="text-gray-600 mt-1">Gain insights from customer feedback</p>
@@ -67,14 +82,7 @@ const FileUpload = ({ setAnalysisData, setIsLoading }) => {
         <h3 className="text-sm font-semibold mb-2 text-gray-700">File Requirements</h3>
         <p className="text-sm text-gray-600 mb-3">Your CSV must include these columns:</p>
         <ul className="grid grid-cols-2 gap-2 text-sm text-gray-700">
-          {[
-            'Title',
-            'Review',
-            'Date',
-            'Rating',
-            'Customer Name',
-            'Customer Location',
-          ].map((item, idx) => (
+          {['Title', 'Review', 'Date', 'Rating', 'Customer Name', 'Customer Location'].map((item, idx) => (
             <li key={idx} className="flex items-center gap-2">
               <FaCheckCircle className="text-green-500" />
               {item}
@@ -83,9 +91,48 @@ const FileUpload = ({ setAnalysisData, setIsLoading }) => {
         </ul>
       </div>
 
-      <p className="text-xs text-center text-gray-400 mt-4">
-        🔒 Your data is processed securely
-      </p>
+      <p className="text-xs text-center text-gray-400 mt-4">🔒 Your data is processed securely</p>
+
+      {/* Preview section after upload */}
+      {responseData && (
+        <div className="mt-8 bg-white border p-4 rounded-lg">
+          <h3 className="text-lg font-semibold text-purple-700 mb-2">Analysis Summary</h3>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-gray-700">Sentiment Distribution</h4>
+            <ul className="text-sm text-gray-600">
+              {Object.entries(responseData.sentiment_distribution).map(([key, val]) => (
+                <li key={key}>
+                  {key}: {(val * 100).toFixed(2)}%
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-gray-700">Feature Impacts</h4>
+            <ul className="text-sm text-gray-600">
+              {responseData.feature_impacts.map((item, idx) => (
+                <li key={idx}>
+                  <strong>{item.Feature}</strong> — Coeff: {item.Coefficient.toFixed(3)}, R²: {item['R-squared'].toFixed(3)}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-gray-700">Sample Predictions</h4>
+            <ul className="text-sm text-gray-600 space-y-2">
+              {responseData.sample_predictions.slice(0, 3).map((pred, idx) => (
+                <li key={idx} className="border p-2 rounded bg-gray-50">
+                  <p className="italic">"{pred.Review.slice(0, 100)}..."</p>
+                  <p className="text-xs text-gray-500">Predicted: {pred.predicted_sentiment}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,27 +2,34 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 
 const SentimentPieChart = ({ data }) => {
   const chartData = [
-    { name: 'Negative', value: data.Negative * 100, color: '#ef4444' },
-    { name: 'Positive', value: data.Positive * 100, color: '#10b981' },
-  ];
+  { name: 'Negative', value: data.negative * 100, color: '#ef4444' },
+  { name: 'Neutral', value: data.neutral * 100, color: '#fbbf24' },
+  { name: 'Positive', value: data.positive * 100, color: '#10b981' },
+];
 
-  const dominantSentiment = data.Negative > data.Positive ? 'Negative' : 'Positive';
-  const dominantPercentage = (dominantSentiment === 'Negative' 
-    ? data.Negative * 100 
-    : data.Positive * 100
-  ).toFixed(1);
+const sentimentOrder = ['negative', 'neutral', 'positive'];
+const dominantSentiment = sentimentOrder.reduce((a, b) =>
+  data[a] > data[b] ? a : b
+);
+const dominantPercentage = (data[dominantSentiment] * 100).toFixed(1);
 
   return (
     <div className="bg-white rounded shadow p-6">
       <h3 className='font-semibold text-xl'>Sentiment Distribution</h3>
       <div className="sentiment-summary">
-        <h2 
-          className={dominantSentiment === 'Negative' ? 'negative' : 'positive'}
+        <h2
+          className={
+            dominantSentiment === 'Negative'
+              ? 'text-red-500'
+              : dominantSentiment === 'Neutral'
+              ? 'text-yellow-500'
+              : 'text-green-500'
+          }
         >
           Overall: {dominantSentiment} ({dominantPercentage}%)
         </h2>
       </div>
-      
+
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
